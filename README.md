@@ -3,6 +3,8 @@ cmp-analysis
 
 Data analysis code and results for the Censorship Monitoring Project
 
+For now you access the nightly CSV dumps of filter data located [here](https://api.blocked.org.uk/data/export.csv.gz)
+
 Get involved!
 -------------
 
