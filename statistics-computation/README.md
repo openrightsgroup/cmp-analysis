@@ -1,5 +1,7 @@
-cmp-analysis
+cmp-analysis - Statistics Computation
 ============
+
+This directory contains the Python scripts to compute statistics from which the plots are created.
 
 Code for computing statistics as part of the data analysis for the Censorship Monitoring Project.
 

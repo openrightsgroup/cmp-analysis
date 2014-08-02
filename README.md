@@ -3,6 +3,10 @@ cmp-analysis
 
 Data analysis code and results for the Censorship Monitoring Project
 
+The code for data analysis is split into two directories:
+1. statistics-computation: this contains the Python scripts for computing features from the exported filter robe results data.
+2. plotting-scripts: this contains the R scripts for plotting the performance of the filters.
+
 For now you access the nightly CSV dumps of filter data located [here](https://api.blocked.org.uk/data/export.csv.gz)
 
 Get involved!
