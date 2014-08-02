@@ -4,9 +4,13 @@ cmp-analysis - Plotting Scripts
 This directory contains the R scripts to plot the exported probe result data.
 
 To run and plot distributions:
+
 1. Download the latest version of the probe data export from ORG from [here](https://api.blocked.org.uk/data/export.csv.gz) into the /<local-git-repo>/cmp-analysis/data directory, and extract it (you should then get an export.csv file)
+
 2. cd into <local-git-repo>/cmp-analysis/statistics-computation and then run 'python ComputeBlockedEntries.py' to compute statistics data for plotting
+
 3. cd into <local-git-repo>/cmp-analysis/plotting-scripts and edit Export-Plots.R and set the preamble variable 'gitRepoPath' to point to the <local-git-repo>
+
 4. Run Export-Plots.R to produce PDF files of to-date statistics of blocks
 
 Get involved!
