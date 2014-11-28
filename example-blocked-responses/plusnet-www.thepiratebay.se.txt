@@ -1,0 +1,32 @@
+* About to connect() to www.thepiratebay.se port 80 (#0)
+*   Trying 194.71.107.15...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* connected
+* Connected to www.thepiratebay.se (194.71.107.15) port 80 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.26.0
+> Host: www.thepiratebay.se
+> Accept: */*
+> 
+* additional stuff not fine transfer.c:1037: 0 0
+* HTTP 1.1 or later with persistent connection, pipelining supported
+< HTTP/1.1 301 Moved Permanently
+< Server: nginx/1.6.0
+< Date: Fri, 28 Nov 2014 21:34:22 GMT
+< Content-Type: text/html
+< Content-Length: 184
+< Connection: keep-alive
+< Location: http://thepiratebay.se/
+< 
+{ [data not shown]
+100   184  100   184    0     0   1340      0 --:--:-- --:--:-- --:--:--  2628
+* Connection #0 to host www.thepiratebay.se left intact
+<html>
+<head><title>301 Moved Permanently</title></head>
+<body bgcolor="white">
+<center><h1>301 Moved Permanently</h1></center>
+<hr><center>nginx/1.6.0</center>
+</body>
+</html>
+* Closing connection #0
