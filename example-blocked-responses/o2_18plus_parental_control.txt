@@ -1,0 +1,27 @@
+
+# wget -4 -v -S -O  /dev/null http://pornhub.com
+--2014-12-10 16:11:10--  http://pornhub.com/
+Resolving pornhub.com (pornhub.com)... 31.192.117.132
+Connecting to pornhub.com (pornhub.com)|31.192.117.132|:80... connected.
+HTTP request sent, awaiting response... 
+  HTTP/1.1 302 Moved Temporarily
+  Location: http://assets.o2.co.uk/18plusaccess/
+  Transfer-Encoding: chunked
+Location: http://assets.o2.co.uk/18plusaccess/ [following]
+--2014-12-10 16:11:14--  http://assets.o2.co.uk/18plusaccess/
+Resolving assets.o2.co.uk (assets.o2.co.uk)... 82.132.140.221
+Connecting to assets.o2.co.uk (assets.o2.co.uk)|82.132.140.221|:80... connected.
+HTTP request sent, awaiting response... 
+  HTTP/1.1 200 OK
+  Server: Apache
+  Accept-Ranges: bytes
+  Vary: Accept-Encoding
+  Content-Type: text/html
+  Age: 2400
+  Date: Wed, 10 Dec 2014 15:31:14 GMT
+  Expires: Wed, 10 Dec 2014 16:01:14 GMT
+  Last-Modified: Tue, 07 Jan 2014 08:35:31 GMT
+  Cache-Control: max-age=1800
+  Transfer-Encoding: chunked
+Length: unspecified [text/html]
+Saving to: `/dev/null'
