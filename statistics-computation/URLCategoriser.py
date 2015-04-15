@@ -1,52 +1,28 @@
-import EntriesIO
 import json
 from EntriesIO import EntriesRetriever
-import urlparse
 
-class URLCategoriser:
+def writePerFilterBlockCounts(per_filter_blocked_categories, category_depth) :
+    # For each ispfilter, write out the dictionary mapping the categories and their counts
+    for isp_filter in  per_filter_blocked_categories:
+        file = open("../data/per-isp-filter/categories/" + isp_filter.replace(" ","_") + "_categoriesToBlockCount" + str(category_depth) + ".tsv","w")
+        file.write("Category\tBlock.Count\n")
+        innerBlockDict = per_filter_blocked_categories[isp_filter]
+        for category in innerBlockDict:
+            try :
+                file.write(category + "\t" + str(innerBlockDict[category]) + "\n")
+            except UnicodeEncodeError:
+                print "UnicodeEncodeError"
+        file.close()
 
-    def __init__(self):
-        self.urlMap = {}
-
-    def categorise(self,url):
-        category = ""
-
-        # First check that we don't have anything mapped for this URL
-        if url not in self.urlMap :
-            # ask dmoz for the category of the url
-            category = "something"
-            self.urlMap[url] = category
-        else :
-            category = self.urlMap[url]
-
-        return category
-
-    def __str__(self):
-        return "Computed: " + self.urlMap.__len__()
-
-
-# Main execution code
-# Get the list of blocked entries from the cleaned export
-#recordList = EntriesIO.getBlockedEntries()
-
-# Initialise the categoriser
-#categoriser = URLCategoriser()
-#
-#testURL = "www.google.com"
-#category = categoriser.categorise(testURL)
-#
-#print category
-
+##### Main execution code
 jsonoutputfile = '../data/output.json'
 linecount = float(sum(1 for line in open(jsonoutputfile)))
 
 # Get the set of URLs that are to be analysed
 retriever = EntriesRetriever()
-#url_set = retriever.retrieveURLs()
 blocked_records = retriever.getBlockedEntries()
 url_set = set([record.url for record in blocked_records])
 url_set_extended = set([url + "/" for url in url_set])
-#print url_set
 
 # map the url to its topics
 urltopics = {}
@@ -57,15 +33,10 @@ for line in f:
     # parse the line
     j = json.loads(line)
     url = j["url"]
-
-    # strip the URL down to just its root domain
-#    parsed_result = urlparse.urlparse(url)
-#    stripped_url = parsed_result[0] + "://" + parsed_result[1]
-#    print url + " => " + stripped_url
-
     if url in url_set or url in url_set_extended:
         topics = j["topic"]
-        urltopics[url] = topics
+        # Strip out the first top element
+        urltopics[url] = topics.replace("Top/","").replace("'","")
         print "Added"
 
     # get the progress
@@ -76,13 +47,61 @@ for line in f:
 #    if progress > 5:
 #        break
 
+#### Code to analyse the topic level distribution
+topic_level_depths = [4, 5, 6]
+for topic_level_depth in topic_level_depths:
+    ##### Computer per filter block distribution
+    print "Computing blocked categories distribution for depth " + str(topic_level_depth)
+    per_filter_blocked_categories = {}
+    for record in blocked_records:
+        # Check that we have a mapping from the url to its topics
+        url_key = ""
+        matched_url = False
+        if record.url in urltopics:
+            url_key = record.url
+            matched_url = True
+        elif record.url + "/" in urltopics:
+            url_key = record.url + "/"
+            matched_url = True
 
-    ## to here: need to modify this to handle the set of urls as input (this reduces the memory space issue)
+        if matched_url:
+            isp_filter = record.networkName
+            topics_list = urltopics[url_key].split("/")
 
-print urltopics
-print len(urltopics)
+            # build the topic key to the topic_level_depth
+            topic_key = ""
+            if len(topics_list) <= topic_level_depth:
+                topic_key = urltopics[url_key] + "/"
+            else:
+                i = 0
+                while i < topic_level_depth - 1:
+                    topic_key += topics_list[i] + "/"
+                    i += 1
 
-#for record in recordList :
-#    category = categoriser.categorise(record.url)
-#    print record.url + " | " + category
+            # check that we have a mapping for the isp_filter already, if not create one
+            if isp_filter not in per_filter_blocked_categories:
+                blocked_cats = {topic_key: 1}
+                per_filter_blocked_categories[isp_filter] = blocked_cats
+            else:
+                blocked_cats = per_filter_blocked_categories[isp_filter]
+                # add the topic to the map, or increment the count
+                if topic_key in blocked_cats:
+                    blocked_cats[topic_key] += 1
+                else:
+                    blocked_cats[topic_key] = 1
+                per_filter_blocked_categories[isp_filter] = blocked_cats
+
+    # show the output from the mapping
+    for isp_filter in per_filter_blocked_categories:
+        print "\n" + isp_filter
+        print per_filter_blocked_categories[isp_filter]
+
+    # Write the distribution to a local file for plotting in R
+    writePerFilterBlockCounts(per_filter_blocked_categories, topic_level_depth)
+
+
+
+        
+
+
 
