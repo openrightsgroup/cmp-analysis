@@ -9,6 +9,13 @@ import csv
 import tldextract
 from Record import Record
 
+cleanedExport = "../data/export_cleaned.csv"
+
+# Changed entries found in: https://api.blocked.org.uk/data/changes-20141127.csv.gz
+
+# Transitions to examine:
+# 1: Error to ok
+# 2: Ok to error
 
 # Create a list of filter records
 recordList = []
@@ -16,7 +23,7 @@ recordList = []
 # Get the export file and read it in as a map between URL and probe tests
 print 'Reading in export from the file'
 count = 0
-with open('../data/export.csv', 'rb') as csvfile:
+with open(cleanedExport, 'rb') as csvfile:
     # tokenise the line by comma delimiter
     csvReader = csv.reader(csvfile, delimiter=',', quotechar='"')
     for row in csvReader:        
@@ -31,14 +38,14 @@ with open('../data/export.csv', 'rb') as csvfile:
         print count
  
         # Insert a temporary break to test for this       
-        if(count > 10000):
-            break
+#        if(count > 10000):
+#            break
         
 # Parse the domains and get the blocks per domain
 domainsToBlocksDict = {}
 for record in recordList:
     # check to see if the record is a block
-    if(record.status == "blocked"):
+    if record.status == "blocked":
         # get the domain of the record
         domain = tldextract.extract(record.url)
         domain = domain.domain

@@ -87,6 +87,8 @@ def computeBlockedEntries() :
     writeBlockCounts(domainsToBlocksDict)
     writePerFilterBlockCounts(filtersToDomainBlocksDict)
 
+
+
 # Writes the domain block frequency distribution to a file
 def writeBlockCounts(domainsToBlocksDict) :
     # Write the dictionary to a local file for R to plot
@@ -104,7 +106,7 @@ def writeBlockCounts(domainsToBlocksDict) :
 def writePerFilterBlockCounts(filtersToDomainBlocksDict) :
     # For each ispfilter, write out the dictionary mapping the domains to their counts
     for ispFilter in  filtersToDomainBlocksDict:
-        file = open("../data/per-isp-filter/" + ispFilter.replace(" ","_") + "_domainToBlockCount.tsv","w")
+        file = open("../data/per-isp-filter/domains/" + ispFilter.replace(" ","_") + "_domainToBlockCount.tsv","w")
         file.write("Domain\tBlock.Count\n")
         innerBlockDict = filtersToDomainBlocksDict[ispFilter]
         for domain in innerBlockDict:
@@ -117,6 +119,7 @@ def writePerFilterBlockCounts(filtersToDomainBlocksDict) :
 
 
 # Execution code:
+#cleanExport()
 computeBlockedEntries()
         
         

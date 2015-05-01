@@ -1,7 +1,7 @@
 from FilterClassifier import Filter
 
 
-class TalkTalk(Filter):
+class TalkTalkFilter(Filter):
 
     def __init__(self):
         # Add the DMOZ categories that should be blocked

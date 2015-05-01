@@ -1,5 +1,5 @@
-import json
 from EntriesIO import EntriesRetriever
+from DMOZUtils import DMOZUtils
 
 def writePerFilterBlockCounts(per_filter_blocked_categories, category_depth) :
     # For each ispfilter, write out the dictionary mapping the categories and their counts
@@ -15,8 +15,6 @@ def writePerFilterBlockCounts(per_filter_blocked_categories, category_depth) :
         file.close()
 
 ##### Main execution code
-jsonoutputfile = '../data/output.json'
-linecount = float(sum(1 for line in open(jsonoutputfile)))
 
 # Get the set of URLs that are to be analysed
 retriever = EntriesRetriever()
@@ -24,28 +22,7 @@ blocked_records = retriever.getBlockedEntries()
 url_set = set([record.url for record in blocked_records])
 url_set_extended = set([url + "/" for url in url_set])
 
-# map the url to its topics
-urltopics = {}
-f = open(jsonoutputfile, 'r')
-
-count = float(1.0)
-for line in f:
-    # parse the line
-    j = json.loads(line)
-    url = j["url"]
-    if url in url_set or url in url_set_extended:
-        topics = j["topic"]
-        # Strip out the first top element
-        urltopics[url] = topics.replace("Top/","").replace("'","")
-        print "Added"
-
-    # get the progress
-    progress = (count / linecount) * 100
-    print progress
-    count += 1
-
-#    if progress > 5:
-#        break
+urltopics = DMOZUtils.get_dmoz_categories(url_set, url_set_extended)
 
 #### Code to analyse the topic level distribution
 topic_level_depths = [4, 5, 6]

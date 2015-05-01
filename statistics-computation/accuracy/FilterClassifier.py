@@ -14,8 +14,3 @@ class Filter:
     @abstractmethod
     def block_cat(self, url_cat):
         pass
-
-
-
-
-
