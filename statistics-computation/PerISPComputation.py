@@ -18,9 +18,10 @@ if __name__ == "__main__":
         tokens = line.split(",")
         if len(tokens) is 10:
             filter_name = tokens[2]
+            request_result = tokens[4]
             url = tokens[0]
             result = Result(filter_name)
-            result.checkURL(str(len(topics)))
+            result.check_url(url, topics, request_result)
 #            result.checkURL(str(topics.count()))
             return (filter_name, result)
         else:
@@ -29,7 +30,7 @@ if __name__ == "__main__":
 
     def reduceByName(result1, result2):
         result = Result(result1.filter_name)
-        result.mergeResults(result1, result2)
+        result.merge_results(result1, result2)
         return result
 
     ##### For loading DMOZ categories
@@ -37,7 +38,6 @@ if __name__ == "__main__":
         j = json.loads(line)
         url = j["url"]
         topics = j["topic"]
-
         # Strip out the first top element
         return (url, topics.replace("Top/","").replace("'",""))
 
