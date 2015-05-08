@@ -96,3 +96,26 @@ class Result(object):
                + " | fp = " + str(self.false_pos) + " | fn = " + str(self.false_neg)\
                + " | prec = " + str("%.3f" % prec) + " | rec = " + str("%.3f" % rec) + " | FPR = " + str("%.3f" % fpr) \
                + " | mcc = " + str("%.3f" % mcc) + " | F1 = " + str("%.3f" % f1)
+
+    def csv_str(self):
+        # compute precision, recall, fpr, and f-measure if we have non zero numbers
+        prec = 0
+        rec = 0
+        fpr = 0
+        mcc = 0
+        f1 = 0
+        if self.true_pos > 0 and self.false_pos > 0 and self.false_neg > 0:
+            prec = float(self.true_pos) / (float(self.true_pos) + float(self.false_pos))
+            rec = float(self.true_pos) / (float(self.true_pos) + float(self.false_neg))
+            fpr = float(self.false_pos) / (float(self.false_pos) + float(self.true_neg))
+            mcc_numerator = (float(self.true_pos) * float(self.true_neg)) - (float(self.false_pos) * float(self.false_neg))
+            mcc_denominator = (self.true_pos + self.false_pos) * (self.true_pos + self.false_neg) * (self.true_neg + self.false_pos) * (self.true_neg + self.false_neg)
+            mcc_denominator = math.sqrt(mcc_denominator)
+            if mcc_denominator > 0:
+                mcc = mcc_numerator / mcc_denominator
+            f1 = 2 * ((prec * rec) / (prec + rec))
+
+        return str(self.true_pos) + "," + str(self.true_neg)\
+               + "," + str(self.false_pos) + "," + str(self.false_neg)\
+               + "," + str("%.3f" % prec) + "," + str("%.3f" % rec) + "," + str("%.3f" % fpr)\
+               + "," + str("%.3f" % mcc) + "," + str("%.3f" % f1)
