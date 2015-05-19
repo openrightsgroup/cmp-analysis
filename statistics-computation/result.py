@@ -120,6 +120,7 @@ class Result(object):
                + "," + str("%.3f" % prec) + "," + str("%.3f" % rec) + "," + str("%.3f" % fpr)\
                + "," + str("%.3f" % mcc) + "," + str("%.3f" % f1)
 
+#test
 
 class ResultLog(object):
     def __init__(self, filter_name):

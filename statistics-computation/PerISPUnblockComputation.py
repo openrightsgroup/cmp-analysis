@@ -46,6 +46,7 @@ if __name__ == "__main__":
     def ispDomainMapper((key, value)):
         pass
 
+#test
     ##### Main Execution Code
     conf = SparkConf().setAppName("CMP Filters - Unblock Delta Function Computation")
     conf.set("spark.python.worker.memory","10g")

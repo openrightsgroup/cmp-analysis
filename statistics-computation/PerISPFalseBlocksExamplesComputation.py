@@ -58,6 +58,7 @@ if __name__ == "__main__":
     conf.setMaster("mesos://zk://scc-culture-mind.lancs.ac.uk:2181/mesos")
     conf.set("spark.executor.uri", "hdfs://scc-culture-mind.lancs.ac.uk/lib/spark-1.3.0-bin-hadoop2.4.tgz")
     conf.set("spark.broadcast.factory", "org.apache.spark.broadcast.TorrentBroadcastFactory")
+    #test
 
     sc = SparkContext(conf=conf)
     sc.setCheckpointDir("hdfs://scc-culture-mind.lancs.ac.uk/data/checkpointing")
