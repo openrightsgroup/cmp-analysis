@@ -22,7 +22,7 @@ if __name__ == "__main__":
             request_result = tokens[4]
             url = tokens[0]
             dateString = tokens[5]
-            date = datetime.strptime(dateString.replace("\"",""), dateFormatter)
+            date = datetime.strptime(dateString.replace("\"", ""), dateFormatter)
 
             date_to_status = {date: request_result}
             url_to_results = {url: date_to_status}
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     conf = SparkConf().setAppName("CMP Filters - Unblock Delta Function Computation")
     conf.set("spark.python.worker.memory","10g")
     conf.set("spark.driver.memory","15g")
-    conf.set("spark.executor.memory","10g")
+    conf.set("spark.executor.memory", "10g")
     conf.set("spark.default.parallelism", "12")
     conf.set("spark.mesos.coarse", "true")
     conf.set("spark.driver.maxResultSize", "10g")
