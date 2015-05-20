@@ -7,7 +7,8 @@ from pyspark import SparkContext, SparkConf
 from result import Result
 import json
 from functools import partial
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+import os
 
 if __name__ == "__main__":
 
@@ -22,13 +23,15 @@ if __name__ == "__main__":
             request_result = tokens[4]
             url = tokens[0]
             dateString = tokens[5]
-            date = datetime.strptime(dateString.replace("\"", ""), dateFormatter)
+            if "Result" not in dateString:
+                date = datetime.strptime(dateString.replace("\"", ""), dateFormatter)
+                date_to_status = {date: request_result}
+                url_to_results = {url: date_to_status}
+                return (filter_name, url_to_results)
+            else:
+                url_to_results = {}
+                return ("null", url_to_results)
 
-            date_to_status = {date: request_result}
-            url_to_results = {url: date_to_status}
-
-#            result.checkURL(str(topics.count()))
-            return (filter_name, url_to_results)
         else:
             url_to_results = {}
             return ("null", url_to_results)
@@ -55,6 +58,8 @@ if __name__ == "__main__":
     conf.set("spark.default.parallelism", "12")
     conf.set("spark.mesos.coarse", "true")
     conf.set("spark.driver.maxResultSize", "10g")
+    # Added the core limit to avoid resource allocation overruns
+    conf.set("spark.cores.max", "5")
     conf.setMaster("mesos://zk://scc-culture-mind.lancs.ac.uk:2181/mesos")
     conf.set("spark.executor.uri", "hdfs://scc-culture-mind.lancs.ac.uk/lib/spark-1.3.0-bin-hadoop2.4.tgz")
     conf.set("spark.broadcast.factory", "org.apache.spark.broadcast.TorrentBroadcastFactory")
@@ -69,16 +74,38 @@ if __name__ == "__main__":
     ispDomainsMap = distFile.map(lambda line: ispNameMapper(line)).reduceByKey(reduceByISPName)
     output = ispDomainsMap.collect()
     print("ISP - Status results")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     for (isp, url_to_results) in output:
         print(isp + "...")
+        # for each ISP log the delta distribution (in hours) between the blocked and ok dates
+        delta_dist = []
         for url in url_to_results:
-            print(url + "......")
+            # print(url + "......")
             date_to_status = url_to_results[url]
-            for date in date_to_status:
-                print(date + " with " + date_to_status[date])
+            prior_blocked = False
+            blocked_date = date.today()
+            for date in sorted(date_to_status.keys()):
+                status = str(date_to_status[date])
 
-    print("Running second map reduce job to generate isp-to-unblock-time-count map ")
+                # check if the URL has been blocked
+                if "blocked" in status:
+                    prior_blocked = True
+                    blocked_date = date
 
+                # check if the next URL is OK
+                if prior_blocked:
+                    if "ok" in status:
+                        prior_blocked = False
+                        unblock_date = date
+                        # work out the difference in hours
+                        hoursDiff = unblock_date - blocked_date
+                        delta_dist.append(str(hoursDiff.total_seconds() / 60))
+        print(delta_dist)
+        # Write the delta distribution to a CSV file for processing
+        file = open(current_dir + "/../data/output/" + isp + "_unblock_dist.csv", "w")
+        for delta in delta_dist:
+            file.write(str(delta) + "\n")
+        file.close()
 
 
 #    #print("Writing output to HDFS")
