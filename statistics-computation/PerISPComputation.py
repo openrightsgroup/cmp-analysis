@@ -4,7 +4,7 @@ import sys
 from random import random
 from operator import add
 from pyspark import SparkContext, SparkConf
-from result import Result
+from result import ResultLog
 import json
 from functools import partial
 
@@ -20,16 +20,16 @@ if __name__ == "__main__":
             filter_name = tokens[2]
             request_result = tokens[4]
             url = tokens[0]
-            result = Result(filter_name)
+            result = ResultLog(filter_name)
             result.check_url(url, topics, request_result)
 #            result.checkURL(str(topics.count()))
             return (filter_name, result)
         else:
-            result = Result("null")
+            result = ResultLog("null")
             return ("null", result)
 
     def reduceByName(result1, result2):
-        result = Result(result1.filter_name)
+        result = ResultLog(result1.filter_name)
         result.merge_results(result1, result2)
         return result
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     conf.set("spark.mesos.coarse", "true")
     conf.set("spark.driver.maxResultSize", "10g")
     # Added the core limit to avoid resource allocation overruns
-    conf.set("spark.cores.max", "10")
+    conf.set("spark.cores.max", "5")
     conf.setMaster("mesos://zk://scc-culture-mind.lancs.ac.uk:2181/mesos")
     conf.set("spark.executor.uri", "hdfs://scc-culture-mind.lancs.ac.uk/lib/spark-1.3.0-bin-hadoop2.4.tgz")
     conf.set("spark.broadcast.factory", "org.apache.spark.broadcast.TorrentBroadcastFactory")

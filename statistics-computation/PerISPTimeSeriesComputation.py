@@ -5,7 +5,7 @@ import os
 from random import random
 from operator import add
 from pyspark import SparkContext, SparkConf
-from result import Result
+from result import ResultLog
 import json
 from functools import partial
 from datetime import datetime, timedelta
@@ -36,16 +36,16 @@ if __name__ == "__main__":
                 weekDiffKey = (dateMonday - startMonday).days / 7
 
                 # Get the result from checking the URL
-                result = Result(filter_name)
+                result = ResultLog(filter_name)
                 result.check_url(url, topics, request_result)
 
                 # Map the date to when the url was computed
                 return (filter_name, {weekDiffKey: result})
             else:
-                result = Result("null")
+                result = ResultLog("null")
                 return ("null", {0: result})
         else:
-            result = Result("null")
+            result = ResultLog("null")
             return ("null", {0: result})
 
     def reduceByName(resultMap1, resultMap2):
@@ -57,7 +57,7 @@ if __name__ == "__main__":
             # merge the results if they exist for this week already
             if weekKey in resultMapNew:
                 currentWeekResult = resultMapNew[weekKey]
-                newResult = Result(currentWeekResult.filter_name)
+                newResult = ResultLog(currentWeekResult.filter_name)
                 newResult.merge_results(currentWeekResult, weekResult)
                 resultMapNew[weekKey] = newResult
             # otherwise generate map the week to the current result
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
 
     ##### Main Execution Code
-    conf = SparkConf().setAppName("CMP Filters Processing")
+    conf = SparkConf().setAppName("CMP Filters Processing - Time-Series Accuracy Computation")
     conf.set("spark.python.worker.memory","10g")
     conf.set("spark.driver.memory","15g")
     conf.set("spark.executor.memory","10g")
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     conf.set("spark.mesos.coarse", "true")
     conf.set("spark.driver.maxResultSize", "10g")
     # Added the core limit to avoid resource allocation overruns
-    conf.set("spark.cores.max", "10")
+    conf.set("spark.cores.max", "5")
     conf.setMaster("mesos://zk://scc-culture-mind.lancs.ac.uk:2181/mesos")
     conf.set("spark.executor.uri", "hdfs://scc-culture-mind.lancs.ac.uk/lib/spark-1.3.0-bin-hadoop2.4.tgz")
     conf.set("spark.broadcast.factory", "org.apache.spark.broadcast.TorrentBroadcastFactory")

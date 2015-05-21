@@ -199,48 +199,63 @@ class ResultLog(object):
         fpr = 0
         mcc = 0
         f1 = 0
-        if len(self.true_pos) > 0 and len(self.false_pos) > 0 and len(self.false_neg) > 0:
-            prec = float(len(self.true_pos)) / (float(len(self.true_pos)) + float(len(self.false_pos)))
-            rec = float(len(self.true_pos)) / (float(len(self.true_pos)) + float(len(self.false_neg)))
-            fpr = float(len(self.false_pos)) / (float(len(self.false_pos)) + float(len(self.true_neg)))
-            mcc_numerator = (float(len(self.true_pos)) * float(len(self.true_neg))) - (float(len(self.false_pos)) * float(len(self.false_neg)))
-            mcc_denominator = len(self.true_pos + self.false_pos) * \
-                              len(self.true_pos + self.false_neg) * \
-                              len(self.true_neg + self.false_pos) * \
-                              len(self.true_neg + self.false_neg)
+
+        tp = len(set(self.true_pos))
+        fp = len(set(self.false_pos))
+        tn = len(set(self.true_neg))
+        fn = len(set(self.false_neg))
+
+        if tp > 0 and fp > 0 and fn > 0:
+            prec = tp / (tp + fp)
+            rec = tp / (tp + fn)
+            fpr = fp / (fp + tn)
+            mcc_numerator = ( tp * tn) - (fp * fn)
+            mcc_denominator = (tp + fp) * \
+                              (tp + fn) * \
+                              (tn + fp) * \
+                              (tn + fn)
             mcc_denominator = math.sqrt(mcc_denominator)
             if mcc_denominator > 0:
                 mcc = mcc_numerator / mcc_denominator
-            f1 = 2 * ((prec * rec) / (prec + rec))
+            if (prec + rec) > 0:
+                f1 = 2 * ((prec * rec) / (prec + rec))
 
-        return "tp = " + str(len(self.true_pos)) + " | tn = " + str(len(self.true_neg))\
-               + " | fp = " + str(len(self.false_pos)) + " | fn = " + str(len(self.false_neg))\
+        return "tp = " + str(tp) + " | tn = " + str(tn)\
+               + " | fp = " + str(fp) + " | fn = " + str(fn)\
                + " | prec = " + str("%.3f" % prec) + " | rec = " + str("%.3f" % rec) + " | FPR = " + str("%.3f" % fpr) \
                + " | mcc = " + str("%.3f" % mcc) + " | F1 = " + str("%.3f" % f1)
 
     def csv_str(self):
-       # compute precision, recall, fpr, and f-measure if we have non zero numbers
+    # compute precision, recall, fpr, and f-measure if we have non zero numbers
         prec = 0
         rec = 0
         fpr = 0
         mcc = 0
         f1 = 0
-        if len(self.true_pos) > 0 and len(self.false_pos) > 0 and len(self.false_neg) > 0:
-            prec = float(len(self.true_pos)) / (float(len(self.true_pos)) + float(len(self.false_pos)))
-            rec = float(len(self.true_pos)) / (float(len(self.true_pos)) + float(len(self.false_neg)))
-            fpr = float(len(self.false_pos)) / (float(len(self.false_pos)) + float(len(self.true_neg)))
-            mcc_numerator = (float(len(self.true_pos)) * float(len(self.true_neg))) - (float(len(self.false_pos)) * float(len(self.false_neg)))
-            mcc_denominator = len(self.true_pos + self.false_pos) *\
-                              len(self.true_pos + self.false_neg) *\
-                              len(self.true_neg + self.false_pos) *\
-                              len(self.true_neg + self.false_neg)
+
+        tp = len(set(self.true_pos))
+        fp = len(set(self.false_pos))
+        tn = len(set(self.true_neg))
+        fn = len(set(self.false_neg))
+
+        if tp > 0 and fp > 0 and fn > 0:
+            prec = tp / (tp + fp)
+            rec = tp / (tp + fn)
+            fpr = fp / (fp + tn)
+            mcc_numerator = ( tp * tn) - (fp * fn)
+            mcc_denominator = (tp + fp) *\
+                              (tp + fn) *\
+                              (tn + fp) *\
+                              (tn + fn)
             mcc_denominator = math.sqrt(mcc_denominator)
             if mcc_denominator > 0:
                 mcc = mcc_numerator / mcc_denominator
-            f1 = 2 * ((prec * rec) / (prec + rec))
 
-        return str(len(self.true_pos)) + "," + str(len(self.true_neg))\
-               + "," + str(len(self.false_pos)) + "," + str(len(self.false_neg))\
+            if (prec + rec) > 0:
+                f1 = 2 * ((prec * rec) / (prec + rec))
+
+        return str(tp) + "," + str(tn)\
+               + "," + str(fp) + "," + str(fn)\
                + "," + str("%.3f" % prec) + "," + str("%.3f" % rec) + "," + str("%.3f" % fpr)\
                + "," + str("%.3f" % mcc) + "," + str("%.3f" % f1)
 
