@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import sys
-import os
 from random import random
 from operator import add
 from pyspark import SparkContext, SparkConf
@@ -48,7 +47,7 @@ if __name__ == "__main__":
 
 
     ##### Main Execution Code
-    conf = SparkConf().setAppName("CMP Filters Processing - False Blocks Computation")
+    conf = SparkConf().setAppName("CMP Filters Processing - Without World Category")
     conf.set("spark.python.worker.memory","10g")
     conf.set("spark.driver.memory","15g")
     conf.set("spark.executor.memory","10g")
@@ -56,11 +55,10 @@ if __name__ == "__main__":
     conf.set("spark.mesos.coarse", "true")
     conf.set("spark.driver.maxResultSize", "10g")
     # Added the core limit to avoid resource allocation overruns
-    conf.set("spark.cores.max", "10")
+    conf.set("spark.cores.max", "5")
     conf.setMaster("mesos://zk://scc-culture-mind.lancs.ac.uk:2181/mesos")
     conf.set("spark.executor.uri", "hdfs://scc-culture-mind.lancs.ac.uk/lib/spark-1.3.0-bin-hadoop2.4.tgz")
     conf.set("spark.broadcast.factory", "org.apache.spark.broadcast.TorrentBroadcastFactory")
-    #test
 
     sc = SparkContext(conf=conf)
     sc.setCheckpointDir("hdfs://scc-culture-mind.lancs.ac.uk/data/checkpointing")
@@ -85,32 +83,29 @@ if __name__ == "__main__":
     urlTopics.cache()
 
     # broadcast the topics
+#    someValue = 1
+    # convert topics to map and broadcast
     print("Broadcasting key-value pairs from RDD")
     bTopics = sc.broadcast(urlTopics.collectAsMap())
 
+#    bTopics = sc.broadcast({"a": 1, "b": 2, "c": 3})
+    # Separate spark context for broadcasting?
+
+
 #    # Read in export file from local disk as RDD
+#    print("Reading in the export file")
     distFile = sc.textFile("hdfs://scc-culture-mind.lancs.ac.uk/data/export_cleaned.csv")
-    # Existing reduce by key example
-#    counts = distFile.map(lambda line: getNameMapper(line)).reduceByKey(reduceByName)
-    # New use of fold by key to combine partitions using an associative function
-    # Create a dummy ResultLog
-    result_log = ResultLog("null")
-    counts = distFile.map(lambda line: getNameMapper(line)).foldByKey(result_log, reduceByName)
+#    #distFile = sc.textFile("hdfs://scc-culture-mind.lancs.ac.uk/data/iswc2013.tex")
+#    #counts = distFile.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b)
+#    #counts = distFile.flatMap(lambda line: line.split(",")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b)
+    counts = distFile.map(lambda line: getNameMapper(line)).reduceByKey(reduceByName)
 
+#    #print("Writing output to HDFS")
+#    #counts.saveAsTextFile("hdfs://scc-culture-mind.lancs.ac.uk/data/test-export")
     output = counts.collect()
-    print("Writing false positives and false negatives to disk...")
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    for (filter_name, result_log) in output:
-        print(filter_name)
-        # Write to the local file system
-        # false positives first
-        file_fp_write = open(current_dir + "/../data/output/" + filter_name + "_fps.csv", "w")
-        file_fp_write.write(result_log.fp_str())
-        file_fp_write.close()
-
-        # false negatives next
-        file_fn_write = open(current_dir + "/../data/output/" + filter_name + "_fns.csv", "w")
-        file_fn_write.write(result_log.fn_str())
-        file_fn_write.close()
+    print("Filter Accuracy...")
+    for (word, count) in output:
+        print("%s: %s" % (word, count))
+	
     sc.stop()
 
