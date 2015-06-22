@@ -1,6 +1,6 @@
 library("TTR")
 
-# Preamble: set the path to the directory that the checkedout git repo is in - need to do this in order to load the data
+## Preamble: set the path to the directory that the checkedout git repo is in - need to do this in order to load the data
 gitRepoPath <- "/Users/mrowe/Documents/Git/cmp-analysis"
 outputFilesDir <- paste(gitRepoPath, "/data/output/", sep="")
 
