@@ -9,19 +9,29 @@ class BTNormalFilter(Filter):
         self.cats.append("Computers/Hacking")
 
         self.cats.append("Recreation/Drugs")
+
         self.cats.append("Recreation/Food/Drink/Drinking")
+        self.cats.append("Recreation/Food/Drink/Mead")
+        self.cats.append("Recreation/Food/Drink/Wine")
+        self.cats.append("Recreation/Food/Drink/Beer")
+        self.cats.append("Recreation/Food/Drink/Alcopops")
+        self.cats.append("Recreation/Food/Drink/Cider")
+        self.cats.append("Recreation/Food/Drink/Cocktails")
+        self.cats.append("Recreation/Food/Drink/Liquor")
+        self.cats.append("Recreation/Food/Drink/Sake")
         self.cats.append("Health/Specific Substances/Alcoholic Beverages")
+
         self.cats.append("Shopping/Tobacco")
         self.cats.append("Recreation/Tobacco")
         self.cats.append("Society/Relationships/Dating")
         self.cats.append("Society/Relationships/Cyber_Relationships")
-        self.cats.append("Games/Online")
 
     # Checks if the category of the URL should be blocked, or not
     def block_cat(self, url_cat):
         block = False
         for cat in self.cats:
-            if cat in url_cat:
+            # Altered string comparison method to check for substring contains at the start
+            if url_cat.find(cat) is 0:
                 block = True
                 break
         return block
@@ -53,7 +63,8 @@ class SkyFilter(Filter):
     def block_cat(self, url_cat):
         block = False
         for cat in self.cats:
-            if cat in url_cat:
+            # Altered string comparison method to check for substring contains at the start
+            if url_cat.find(cat) is 0:
                 block = True
                 break
         return block
@@ -74,8 +85,18 @@ class TalkTalkFilter(Filter):
         self.cats.append("Computers/Hacking")
 
         self.cats.append("Recreation/Drugs")
-        # self.cats.append("Recreation/Food/Drink/Drinking")
+
+        self.cats.append("Recreation/Food/Drink/Drinking")
+        self.cats.append("Recreation/Food/Drink/Mead")
+        self.cats.append("Recreation/Food/Drink/Wine")
+        self.cats.append("Recreation/Food/Drink/Beer")
+        self.cats.append("Recreation/Food/Drink/Alcopops")
+        self.cats.append("Recreation/Food/Drink/Cider")
+        self.cats.append("Recreation/Food/Drink/Cocktails")
+        self.cats.append("Recreation/Food/Drink/Liquor")
+        self.cats.append("Recreation/Food/Drink/Sake")
         self.cats.append("Health/Specific Substances/Alcoholic Beverages")
+
         self.cats.append("Shopping/Tobacco")
         self.cats.append("Recreation/Tobacco")
         self.cats.append("Society/Relationships/Dating")
@@ -90,7 +111,8 @@ class TalkTalkFilter(Filter):
     def block_cat(self, url_cat):
         block = False
         for cat in self.cats:
-            if cat in url_cat:
+            # Altered string comparison method to check for substring contains at the start
+            if url_cat.find(cat) is 0:
                 block = True
                 break
         return block
@@ -126,7 +148,8 @@ class VirginMediaFilter(Filter):
     def block_cat(self, url_cat):
         block = False
         for cat in self.cats:
-            if cat in url_cat:
+            # Altered string comparison method to check for substring contains at the start
+            if url_cat.find(cat) is 0:
                 block = True
                 break
         return block
