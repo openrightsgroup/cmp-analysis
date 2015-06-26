@@ -25,6 +25,18 @@ class BTNormalFilter(Filter):
         self.cats.append("Recreation/Tobacco")
         self.cats.append("Society/Relationships/Dating")
         self.cats.append("Society/Relationships/Cyber_Relationships")
+        self.cats.append("Regional/Europe/United Kingdom/Society_and_Culture/Gay,_Lesbian,_and_Bisexual/Relationships")
+
+        # add banned category keywords
+        self.keywords = []
+        self.keywords.append("Wine")
+        self.keywords.append("Beer")
+        self.keywords.append("Brewery")
+        self.keywords.append("Breweries")
+
+        self.keywords.append("Relationships")
+
+
 
     # Checks if the category of the URL should be blocked, or not
     def block_cat(self, url_cat):
@@ -32,6 +44,11 @@ class BTNormalFilter(Filter):
         for cat in self.cats:
             # Altered string comparison method to check for substring contains at the start
             if url_cat.find(cat) is 0:
+                block = True
+                break
+
+        for keyword in self.keywords:
+            if keyword in url_cat:
                 block = True
                 break
         return block
@@ -55,9 +72,15 @@ class SkyFilter(Filter):
         self.cats.append("Recreation/Drugs")
         self.cats.append("Society/Relationships/Dating")
         self.cats.append("Society/Relationships/Cyber_Relationships")
+        self.cats.append("Regional/Europe/United Kingdom/Society_and_Culture/Gay,_Lesbian,_and_Bisexual/Relationships")
+
         self.cats.append("Computers/Internet/On_the_Web/Online_Communities/Social_Networking")
         self.cats.append("Kids_and_Teens/People_and_Society/Online Communities")
         self.cats.append("Games/Online")
+
+        # add banned category keywords
+        self.keywords = []
+        self.keywords.append("Relationships")
 
     # Checks if the category of the URL should be blocked, or not
     def block_cat(self, url_cat):
@@ -65,6 +88,11 @@ class SkyFilter(Filter):
         for cat in self.cats:
             # Altered string comparison method to check for substring contains at the start
             if url_cat.find(cat) is 0:
+                block = True
+                break
+
+        for keyword in self.keywords:
+            if keyword in url_cat:
                 block = True
                 break
         return block
@@ -101,11 +129,22 @@ class TalkTalkFilter(Filter):
         self.cats.append("Recreation/Tobacco")
         self.cats.append("Society/Relationships/Dating")
         self.cats.append("Society/Relationships/Cyber_Relationships")
+        self.cats.append("Regional/Europe/United Kingdom/Society_and_Culture/Gay,_Lesbian,_and_Bisexual/Relationships")
+
         self.cats.append("Games")
         self.cats.append("Computers/Software/Internet/Clients/File_Sharing")
         self.cats.append("Gambling")
         self.cats.append("Computers/Internet/On_the_Web/Online_Communities/Social_Networking")
         self.cats.append("Kids_and_Teens/People_and_Society/Online Communities")
+
+        # add banned category keywords
+        self.keywords = []
+        self.keywords.append("Wine")
+        self.keywords.append("Beer")
+        self.keywords.append("Brewery")
+        self.keywords.append("Breweries")
+
+        self.keywords.append("Relationships")
 
     # Checks if the category of the URL should be blocked, or not
     def block_cat(self, url_cat):
@@ -113,6 +152,11 @@ class TalkTalkFilter(Filter):
         for cat in self.cats:
             # Altered string comparison method to check for substring contains at the start
             if url_cat.find(cat) is 0:
+                block = True
+                break
+
+        for keyword in self.keywords:
+            if keyword in url_cat:
                 block = True
                 break
         return block
@@ -143,6 +187,7 @@ class VirginMediaFilter(Filter):
         # self.cats.append("Gambling")
         # self.cats.append("Computers/Internet/On_the_Web/Online_Communities/Social_Networking")
         # self.cats.append("Kids_and_Teens/People_and_Society/Online Communities")
+
 
     # Checks if the category of the URL should be blocked, or not
     def block_cat(self, url_cat):
