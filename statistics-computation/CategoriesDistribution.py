@@ -35,13 +35,15 @@ def match_cat_with_ofcom_cat(cats):
 
     ofcom_cats = set()
     for cat in cats:
+        # print("cat = " + str(cat))
         # match the cat with the ofcom key
         for ofcom_cat in cat_labels_map:
-            for mapped_cats in cat_labels_map[cat]:
-                for mapped_cat in mapped_cats:
-                    if cat in mapped_cat or mapped_cat in cat:
-                        ofcom_cats.add(ofcom_cat)
-                        break
+            mapped_cats = cat_labels_map[ofcom_cat]
+            for mapped_cat in mapped_cats:
+                # check that the mapped category is contained within the url's category from DMOZ
+                if mapped_cat in cat:
+                    ofcom_cats.add(ofcom_cat)
+                    break
     return ofcom_cats
 
 
@@ -51,30 +53,41 @@ def flatMapLineToOfcomCategorySingletonTuple(line):
 
     # get the topics from the broadcast
     topics = bTopics.value
-    tokens = line.split(",")
+    tokens = line.encode('utf-8').split(",")
     if len(tokens) is 10:
         url = tokens[0]
-
         # match the URL to the topic
         if url in topics or url + "/" in topics:
             url_key = url
             if url+"/" in topics:
                 url_key += "/"
             cats = topics[url_key].split(";")
-            logging.info(url + " - found cats = " + cats)
+            logging.info(url + " - found cats = " + str(cats))
 
             # get the ofcom key from the cats
             ofcom_cats = match_cat_with_ofcom_cat(cats)
             for ofcom_cat in ofcom_cats:
-                ofcom_freq_tuples.append((ofcom_cat, 1))
-
+                # url_set.append(url)
+                # url_list = [url]
+                ofcom_freq_tuples.append((ofcom_cat, url))
     return ofcom_freq_tuples
+
+# def ofcomCategoriesReducer(tupleMap1, tupleMap2):
+#     returnTupleMap = tupleMap1
+#     for url in tupleMap2:
+#         if url not in returnTupleMap:
+#             returnTupleMap[url] = tupleMap2[url]
+#     return returnTupleMap
+
+def ofcomUrlCounter(tuple):
+    url_set = set(tuple[1])
+    return (tuple[0], len(url_set))
 
 ##### For loading DMOZ categories
 def getURLMapper(line):
     j = json.loads(line)
-    url = j["url"]
-    topics = j["topic"]
+    url = j["url"].encode('utf-8')
+    topics = j["topic"].encode('utf-8')
     # Strip out the first top element
     return (url, topics.replace("Top/","").replace("'",""))
 
@@ -87,14 +100,14 @@ if __name__ == "__main__":
     ##### Main Execution Code
     conf = SparkConf().setAppName("CMP Filters Processing - Categories Analyser")
     conf.set("spark.python.worker.memory","10g")
-    conf.set("spark.driver.memory","15g")
+    conf.set("spark.driver.memory","10g")
     conf.set("spark.executor.memory","10g")
     conf.set("spark.default.parallelism", "12")
     conf.set("spark.mesos.coarse", "true")
     conf.set("spark.driver.maxResultSize", "10g")
     # Added the core limit to avoid resource allocation overruns
     conf.set("spark.cores.max", "5")
-    conf.setMaster("mesos://zk://scc-culture-mind.lancs.ac.uk:2181/mesos")
+    conf.setMaster("mesos://zk://scc-culture-slave9.lancs.ac.uk:2181/mesos")
     conf.set("spark.executor.uri", "hdfs://scc-culture-mind.lancs.ac.uk/lib/spark-1.3.0-bin-hadoop2.4.tgz")
     conf.set("spark.broadcast.factory", "org.apache.spark.broadcast.TorrentBroadcastFactory")
 
@@ -128,17 +141,34 @@ if __name__ == "__main__":
 
     # go through and get the category of each URL
     print("Counting Ofcom Categories of URLs")
-    distFile = sc.textFile("hdfs://scc-culture-mind.lancs.ac.uk/data/export_cleaned.csv")
+    distFile = sc.textFile("hdfs://scc-culture-mind.lancs.ac.uk/data/export-dec-2015.csv")
     category_counts = distFile\
-        .flatMap(match_cat_with_ofcom_cat)\
+        .flatMap(flatMapLineToOfcomCategorySingletonTuple)\
         .map(lambda x: x)\
-        .reduceByKey(lambda a, b: a + b)\
-        .map(lambda x: (x[1], x[0]))\
-        .sortBy()\
-        .map(lambda x: (x[1]. x[0]))\
-        .collectAsMap()
+        .collect()
+        # .map(ofcomUrlCounter)\
 
-    print("Printing results)")
-    for category in category_counts:
-        print str(category) + " with " + str(category_counts[category])
+
+    print("Performing single node reduction")
+    ofcom_cat_map = {}
+    for (ofcom_cat, url) in category_counts:
+        if ofcom_cat in ofcom_cat_map:
+            cat_urls = ofcom_cat_map[ofcom_cat]
+            cat_urls.add(url)
+            ofcom_cat_map[ofcom_cat] = cat_urls
+        else:
+            cat_urls = set()
+            cat_urls.add(url)
+            ofcom_cat_map[ofcom_cat] = cat_urls
+
+    for ofcom_cat in ofcom_cat_map:
+        print(ofcom_cat + " size = " + str(len(ofcom_cat_map[ofcom_cat])))
+
+
+    print("Counting total URLs")
+    total_url_set = set()
+    for (ofcom_cat, url) in category_counts:
+        total_url_set.add(url)
+    print("Total URLs = " + str(len(total_url_set)))
+
 
